@@ -23,7 +23,7 @@
 
 namespace OCA\FilesExternalS3\AppInfo;
 
-use OCA\FilesExternalS3\Auth\AccessKey;
+//use OCA\FilesExternalS3\Auth\AccessKey;
 use OCA\FilesExternalS3\Backend\AmazonS3;
 use OCP\AppFramework\App;
 use OCP\Files\External\Config\IAuthMechanismProvider;
@@ -64,7 +64,9 @@ class Application extends App implements IBackendProvider, IAuthMechanismProvide
 	public function getAuthMechanisms() {
 		$container = $this->getContainer();
 		return [
-			$container->query(AccessKey::class)
+			$container->query('\OC\Files\External\Auth\NullMechanism')
+			//$container->query('OCA\Files_External\Lib\Auth\NullMechanism') //,
+			//$container->query(AccessKey::class)
 		];
 	}
 }

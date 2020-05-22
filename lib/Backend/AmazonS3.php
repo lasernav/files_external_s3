@@ -24,7 +24,7 @@
 
 namespace OCA\FilesExternalS3\Backend;
 
-//use OCA\FilesExternalS3\Auth\AccessKey;
+use OCA\FilesExternalS3\Auth\AccessKey;
 use OCP\Files\External\Auth\AuthMechanism;
 use OCP\Files\External\Backend\Backend;
 use OCP\Files\External\DefinitionParameter;
@@ -49,8 +49,8 @@ class AmazonS3 extends Backend {
 				(new DefinitionParameter('use_path_style', $l->t('Enable Path Style')))
 					->setType(DefinitionParameter::VALUE_BOOLEAN),
 			])
-            ->addAuthScheme(AuthMechanism::SCHEME_NULL);
-			//->addAuthScheme(AccessKey::SCHEME_AMAZONS3_ACCESSKEY);
+            ->addAuthScheme(AuthMechanism::SCHEME_NULL)
+			->addAuthScheme(AccessKey::SCHEME_AMAZONS3_ACCESSKEY);
 		;
 	}
 }

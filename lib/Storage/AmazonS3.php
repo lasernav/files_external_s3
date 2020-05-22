@@ -130,10 +130,15 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 	 * @throws \Exception
 	 */
 	public function __construct($params) {
-		if (empty($params['key']) || empty($params['secret']) || empty($params['bucket'])) {
-			throw new \Exception('Access Key, Secret and Bucket have to be configured.');
+		if (array_key_exists('key', $search_array)) {
+			if (empty($params['key']) || empty($params['secret']) || empty($params['bucket'])) {
+				throw new \Exception('Access Key, Secret and Bucket have to be configured.');
+			}
+		} else {
+			if (empty($params['bucket'])) {
+				throw new \Exception('Bucket has to be configured.');
+			}
 		}
-
 		$this->id = 'amazon::' . $params['bucket'];
 
 		$this->bucket = $params['bucket'];
@@ -582,16 +587,23 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 		$base_url = $scheme . '://' . $this->params['hostname'] . ':' . $this->params['port'] . '/';
 
 		$config = [
+            'debug' => true,
 			'version' => '2006-03-01',
 			'region' => $this->params['region'],
 //			'signature_version' => 'v4',
-			'credentials' => [
-				'key' => $this->params['key'],
-				'secret' => $this->params['secret'],
-			],
+//			'credentials' => [
+//				'key' => $this->params['key'],
+//				'secret' => $this->params['secret'],
+//			],
 			'endpoint' => $base_url,
 			'use_path_style_endpoint' => $this->params['use_path_style'],
 		];
+		if (array_key_exists('key', $search_array)) {
+			$config['credentials'] = [
+				'key' => $this->params['key'],
+				'secret' => $this->params['secret'],
+			];
+		}
 		$client = new \GuzzleHttp\Client(['handler' => new StreamHandler()]);
 		$emitter = $client->getEmitter();
 		$emitter->on('before', function (BeforeEvent $event) {

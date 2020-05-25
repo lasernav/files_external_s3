@@ -130,6 +130,7 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 	 * @throws \Exception
 	 */
 	public function __construct($params) {
+
 		if (array_key_exists('key', $search_array)) {
 			if (empty($params['key']) || empty($params['secret']) || empty($params['bucket'])) {
 				throw new \Exception('Access Key, Secret and Bucket have to be configured.');
@@ -153,6 +154,8 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 		$this->params = $params;
 		$this->logger = \OC::$server->getLogger();
 		$this->tempManager = \OC::$server->getTempManager();
+
+		$this->logger->warning("AmazonS3Storage::construct " . var_export($params, TRUE), ['app'=>'files_external']);
 	}
 
 	/**
@@ -162,6 +165,8 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 	 * @return bool
 	 */
 	protected function remove($path) {
+		$this->logger->warning("AmazonS3Storage::remove " . $path, ['app'=>'files_external']);
+
 		// remember fileType to reduce http calls
 		$fileType = $this->filetype($path);
 		if ($fileType === 'dir') {
@@ -176,6 +181,8 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 	}
 
 	public function mkdir($path) {
+		$this->logger->warning("AmazonS3Storage::mkdir " . $path, ['app'=>'files_external']);
+
 		$path = $this->normalizePath($path);
 
 		if ($this->is_dir($path)) {
@@ -203,6 +210,8 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 	}
 
 	public function rmdir($path) {
+		$this->logger->warning("AmazonS3Storage::rmdir " . $path, ['app'=>'files_external']);
+
 		$path = $this->normalizePath($path);
 
 		if ($this->isRoot($path)) {
@@ -217,6 +226,8 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 	}
 
 	protected function clearBucket() {
+		$this->logger->warning("AmazonS3Storage::clearBucket ", ['app'=>'files_external']);
+
 		try {
 			$this->getConnection()->deleteMatchingObjects($this->bucket);
 			return true;
@@ -227,6 +238,8 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 	}
 
 	private function batchDelete($path = null) {
+		$this->logger->warning("AmazonS3Storage::batchDelete " . $path, ['app'=>'files_external']);
+
 		$params = [
 			'Bucket' => $this->bucket
 		];
@@ -266,6 +279,8 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 	}
 
 	public function opendir($path) {
+		$this->logger->warning("AmazonS3Storage::opendir " . $path, ['app'=>'files_external']);
+
 		$path = $this->normalizePath($path);
 
 		if ($this->isRoot($path)) {
@@ -301,6 +316,8 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 	}
 
 	public function stat($path) {
+		$this->logger->warning("AmazonS3Storage::stat " . $path, ['app'=>'files_external']);
+
 		$path = $this->normalizePath($path);
 
 		try {
@@ -332,6 +349,8 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 	}
 
 	public function filetype($path) {
+		$this->logger->warning("AmazonS3Storage::filetype " . $path, ['app'=>'files_external']);
+
 		$path = $this->normalizePath($path);
 
 		if ($this->isRoot($path)) {
@@ -354,6 +373,8 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 	}
 
 	public function unlink($path) {
+		$this->logger->warning("AmazonS3Storage::unlink " . $path, ['app'=>'files_external']);
+
 		$path = $this->normalizePath($path);
 
 		if ($this->is_dir($path)) {
@@ -375,6 +396,8 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 	}
 
 	public function fopen($path, $mode) {
+		$this->logger->warning("AmazonS3Storage::fopen " . $path, ['app'=>'files_external']);
+
 		$path = $this->normalizePath($path);
 
 		switch ($mode) {
@@ -426,6 +449,8 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 	}
 
 	public function touch($path, $mtime = null) {
+		$this->logger->warning("AmazonS3Storage::touch " . $path, ['app'=>'files_external']);
+
 		$path = $this->normalizePath($path);
 
 		if ($mtime === null) {
@@ -470,6 +495,9 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 	}
 
 	public function copy($path1, $path2) {
+		$this->logger->warning("AmazonS3Storage::copy " . $path1 . " to " . $path2, ['app'=>'files_external']);
+
+
 		$path1 = $this->normalizePath($path1);
 		$path2 = $this->normalizePath($path2);
 
@@ -518,6 +546,8 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 	}
 
 	public function rename($path1, $path2) {
+		$this->logger->warning("AmazonS3Storage::rename " . $path1 . " to " . $path2, ['app'=>'files_external']);
+
 		$path1 = $this->normalizePath($path1);
 		$path2 = $this->normalizePath($path2);
 
@@ -545,26 +575,40 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 	}
 
 	public function test() {
+		$this->logger->warning("AmazonS3Storage::test ", ['app'=>'files_external']);
+
+
 		if ($this->getConnection()->getApi()->hasOperation('GetBucketAcl')) {
+			$this->logger->warning("AmazonS3Storage::test GetBucketAcl TRUE", ['app'=>'files_external']);
+
+
 			$test = $this->getConnection()->getBucketAcl([
 				'Bucket' => $this->bucket,
 			]);
 			/** @phan-suppress-next-line PhanDeprecatedFunction */
 			if ($test !== null && $test->getPath('Owner/ID') !== null) {
+				$this->logger->warning("AmazonS3Storage::test Owner TRUE", ['app'=>'files_external']);
 				return true;
 			}
+			$this->logger->warning("AmazonS3Storage::test Owner FALSE", ['app'=>'files_external']);
 			return false;
 		}
+		$this->logger->warning("AmazonS3Storage::test GetBucketAcl FALSE", ['app'=>'files_external']);
 
+		$this->logger->warning("AmazonS3Storage::test listBuckets", ['app'=>'files_external']);
 		$buckets = $this->getConnection()->listBuckets();
 		/** @phan-suppress-next-line PhanDeprecatedFunction */
 		if ($buckets->getPath('Owner/ID') === null) {
+			$this->logger->warning("AmazonS3Storage::test Owner FALSE", ['app'=>'files_external']);
 			return false;
 		}
 		/** @phan-suppress-next-line PhanDeprecatedFunction */
 		$bucketExists = !empty(\array_filter($buckets->getPath('Buckets'), function ($k) {
 			return $k['Name'] === $this->bucket;
 		}));
+
+		$this->logger->warning("AmazonS3Storage::test bucketExists " . $bucketExists, ['app'=>'files_external']);
+
 		return $bucketExists;
 	}
 
@@ -579,52 +623,61 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 	 * @throws \Exception if connection could not be made
 	 */
 	public function getConnection() {
+		$this->logger->warning("AmazonS3Storage::getConnection ", ['app'=>'files_external']);
+
 		if ($this->connection !== null) {
 			return $this->connection;
 		}
 
-		$scheme = ($this->params['use_ssl'] === false) ? 'http' : 'https';
-		$base_url = $scheme . '://' . $this->params['hostname'] . ':' . $this->params['port'] . '/';
+		if (false) {
+			$scheme = ($this->params['use_ssl'] === false) ? 'http' : 'https';
+			$base_url = $scheme . '://' . $this->params['hostname'] . ':' . $this->params['port'] . '/';
 
-		$config = [
-            'debug' => true,
+			$config = [
+				'debug' => true,
+				'version' => '2006-03-01',
+				'region' => $this->params['region'],
+	//			'signature_version' => 'v4',
+				'endpoint' => $base_url,
+				'use_path_style_endpoint' => $this->params['use_path_style'],
+			];
+			if (array_key_exists('key', $search_array)) {
+				$config['credentials'] = [
+					'key' => $this->params['key'],
+					'secret' => $this->params['secret'],
+				];
+			}
+			$client = new \GuzzleHttp\Client(['handler' => new StreamHandler()]);
+			$emitter = $client->getEmitter();
+			$emitter->on('before', function (BeforeEvent $event) {
+				$request = $event->getRequest();
+				if ($request->getMethod() !== 'PUT') {
+					return;
+				}
+				$body = $request->getBody();
+				if ($body !== null && $body->getSize() !== 0) {
+					return;
+				}
+				if ($request->hasHeader('Content-Length')) {
+					return;
+				}
+				// force content length header on empty body
+				$request->setHeader('Content-Length', '0');
+			});
+			$h = new GuzzleHandler($client);
+			$config['http_handler'] = $h;
+			/* @phan-suppress-next-line PhanDeprecatedFunction */
+			$this->connection = S3Client::factory($config);
+		}
+
+		$this->connection = new S3Client([
+			'debug' => true,
 			'version' => '2006-03-01',
 			'region' => $this->params['region'],
-//			'signature_version' => 'v4',
-//			'credentials' => [
-//				'key' => $this->params['key'],
-//				'secret' => $this->params['secret'],
-//			],
-			'endpoint' => $base_url,
-			'use_path_style_endpoint' => $this->params['use_path_style'],
-		];
-		if (array_key_exists('key', $search_array)) {
-			$config['credentials'] = [
-				'key' => $this->params['key'],
-				'secret' => $this->params['secret'],
-			];
-		}
-		$client = new \GuzzleHttp\Client(['handler' => new StreamHandler()]);
-		$emitter = $client->getEmitter();
-		$emitter->on('before', function (BeforeEvent $event) {
-			$request = $event->getRequest();
-			if ($request->getMethod() !== 'PUT') {
-				return;
-			}
-			$body = $request->getBody();
-			if ($body !== null && $body->getSize() !== 0) {
-				return;
-			}
-			if ($request->hasHeader('Content-Length')) {
-				return;
-			}
-			// force content length header on empty body
-			$request->setHeader('Content-Length', '0');
-		});
-		$h = new GuzzleHandler($client);
-		$config['http_handler'] = $h;
-		/* @phan-suppress-next-line PhanDeprecatedFunction */
-		$this->connection = S3Client::factory($config);
+		]);
+
+		$this->logger->warning("AmazonS3Storage::S3Client " .var_export($this->connection->getConfig(), TRUE), ['app'=>'files_external']);
+
 
 		if (!$this->connection->doesBucketExist($this->bucket)) {
 			try {
@@ -639,7 +692,6 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 				]);
 				$this->testTimeout();
 			} catch (S3Exception $e) {
-				$this->logger->logException($e, ['app'=>'files_external']);
 				throw new \Exception('Creation of bucket failed. '.$e->getMessage());
 			}
 		}
@@ -648,6 +700,9 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 	}
 
 	public function writeBack($tmpFile) {
+		$this->logger->warning("AmazonS3Storage::writeBack ", ['app'=>'files_external']);
+
+
 		if (!isset(self::$tmpFiles[$tmpFile])) {
 			return false;
 		}

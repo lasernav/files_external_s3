@@ -131,7 +131,7 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 	 */
 	public function __construct($params) {
 
-		if (array_key_exists('key', $search_array)) {
+		if (array_key_exists('key', $params)) {
 			if (empty($params['key']) || empty($params['secret']) || empty($params['bucket'])) {
 				throw new \Exception('Access Key, Secret and Bucket have to be configured.');
 			}
@@ -206,6 +206,7 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 	}
 
 	public function file_exists($path) {
+		$this->logger->warning("AmazonS3Storage::file_exists " . $path, ['app'=>'files_external']);
 		return $this->filetype($path) !== false;
 	}
 
@@ -637,7 +638,7 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 				'debug' => true,
 				'version' => '2006-03-01',
 				'region' => $this->params['region'],
-	//			'signature_version' => 'v4',
+				//'signature_version' => 'v4',
 				'endpoint' => $base_url,
 				'use_path_style_endpoint' => $this->params['use_path_style'],
 			];
@@ -678,8 +679,10 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 
 		$this->logger->warning("AmazonS3Storage::S3Client " .var_export($this->connection->getConfig(), TRUE), ['app'=>'files_external']);
 
+		$this->logger->warning("AmazonS3Storage::S3Client doesBucketExist TEST " . $this->bucket, ['app'=>'files_external']);
 
 		if (!$this->connection->doesBucketExist($this->bucket)) {
+			$this->logger->warning("AmazonS3Storage::S3Client doesBucketExist FALSE " . $this->bucket, ['app'=>'files_external']);
 			try {
 				$this->connection->createBucket([
 					'Bucket' => $this->bucket
@@ -695,6 +698,8 @@ class AmazonS3 extends \OCP\Files\Storage\StorageAdapter {
 				throw new \Exception('Creation of bucket failed. '.$e->getMessage());
 			}
 		}
+		$this->logger->warning("AmazonS3Storage::S3Client doesBucketExist DONE " . $this->bucket, ['app'=>'files_external']);
+
 
 		return $this->connection;
 	}

@@ -32,17 +32,17 @@ use OCP\IL10N;
  * Amazon S3 access key authentication
  */
 class AccessKey extends AuthMechanism {
-	const SCHEME_AMAZONS3_ACCESSKEY = 'amazons3_accesskey';
+    const SCHEME_AMAZONS3_ACCESSKEY = 'amazons3_accesskey';
 
-	public function __construct(IL10N $l) {
-		$this
-			->setIdentifier('amazons3::accesskey')
-			->setScheme(self::SCHEME_AMAZONS3_ACCESSKEY)
-			->setText($l->t('Access key'))
-			->addParameters([
-				(new DefinitionParameter('key', $l->t('Access key'))),
-				(new DefinitionParameter('secret', $l->t('Secret key')))
-					->setType(DefinitionParameter::VALUE_PASSWORD),
-			]);
-	}
+    public function __construct(IL10N $l) {
+        $this
+            ->setIdentifier('amazons3::accesskey')
+            ->setScheme(self::SCHEME_AMAZONS3_ACCESSKEY)
+            ->setText($l->t('Access key'))
+            ->addParameters([
+                (new DefinitionParameter('key', $l->t('Access key'))),
+                (new DefinitionParameter('secret', $l->t('Secret key')))
+                    ->setType(DefinitionParameter::VALUE_PASSWORD),
+            ]);
+    }
 }

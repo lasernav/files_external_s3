@@ -31,26 +31,26 @@ use OCP\Files\External\DefinitionParameter;
 use OCP\IL10N;
 
 class AmazonS3 extends Backend {
-	public function __construct(IL10N $l) {
-		$this
-			->setIdentifier('files_external_s3')
-			->setStorageClass(\OCA\FilesExternalS3\Storage\AmazonS3::class)
-			->setText($l->t('Amazon S3 compatible (SDK v3)'))
-			->addParameters([
-				(new DefinitionParameter('bucket', $l->t('Bucket'))),
-				(new DefinitionParameter('hostname', $l->t('Hostname')))
-					->setFlag(DefinitionParameter::FLAG_OPTIONAL),
-				(new DefinitionParameter('port', $l->t('Port')))
-					->setFlag(DefinitionParameter::FLAG_OPTIONAL),
-				(new DefinitionParameter('region', $l->t('Region')))
-					->setFlag(DefinitionParameter::FLAG_OPTIONAL),
-				(new DefinitionParameter('use_ssl', $l->t('Enable SSL')))
-					->setType(DefinitionParameter::VALUE_BOOLEAN),
-				(new DefinitionParameter('use_path_style', $l->t('Enable Path Style')))
-					->setType(DefinitionParameter::VALUE_BOOLEAN),
-			])
+    public function __construct(IL10N $l) {
+        $this
+            ->setIdentifier('files_external_s3')
+            ->setStorageClass(\OCA\FilesExternalS3\Storage\AmazonS3::class)
+            ->setText($l->t('Amazon S3 compatible (SDK v3)'))
+            ->addParameters([
+                (new DefinitionParameter('bucket', $l->t('Bucket'))),
+                (new DefinitionParameter('hostname', $l->t('Hostname')))
+                    ->setFlag(DefinitionParameter::FLAG_OPTIONAL),
+                (new DefinitionParameter('port', $l->t('Port')))
+                    ->setFlag(DefinitionParameter::FLAG_OPTIONAL),
+                (new DefinitionParameter('region', $l->t('Region')))
+                    ->setFlag(DefinitionParameter::FLAG_OPTIONAL),
+                (new DefinitionParameter('use_ssl', $l->t('Enable SSL')))
+                    ->setType(DefinitionParameter::VALUE_BOOLEAN),
+                (new DefinitionParameter('use_path_style', $l->t('Enable Path Style')))
+                    ->setType(DefinitionParameter::VALUE_BOOLEAN),
+            ])
             ->addAuthScheme(AuthMechanism::SCHEME_NULL)
-			->addAuthScheme(AccessKey::SCHEME_AMAZONS3_ACCESSKEY);
-		;
-	}
+            ->addAuthScheme(AccessKey::SCHEME_AMAZONS3_ACCESSKEY);
+        ;
+    }
 }

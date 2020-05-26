@@ -33,39 +33,39 @@ use OCP\Files\External\Config\IBackendProvider;
  * @package OCA\FilesExternalS3\AppInfo
  */
 class Application extends App implements IBackendProvider, IAuthMechanismProvider {
-	public function __construct(array $urlParams = []) {
-		parent::__construct('files_external_s3', $urlParams);
+    public function __construct(array $urlParams = []) {
+        parent::__construct('files_external_s3', $urlParams);
 
-		$container = $this->getContainer();
+        $container = $this->getContainer();
 
-		/** @var \OC\Server $server */
-		$server= $container->getServer();
-		/* @phan-suppress-next-line PhanUndeclaredMethod */
-		$backendService = $server->getStoragesBackendService();
-		$backendService->registerBackendProvider($this);
-		$backendService->registerAuthMechanismProvider($this);
-	}
+        /** @var \OC\Server $server */
+        $server= $container->getServer();
+        /* @phan-suppress-next-line PhanUndeclaredMethod */
+        $backendService = $server->getStoragesBackendService();
+        $backendService->registerBackendProvider($this);
+        $backendService->registerAuthMechanismProvider($this);
+    }
 
-	/**
-	 * @{inheritdoc}
-	 */
-	public function getBackends() {
-		$container = $this->getContainer();
+    /**
+     * @{inheritdoc}
+     */
+    public function getBackends() {
+        $container = $this->getContainer();
 
-		$backends = [
-			$container->query(AmazonS3::class)
-		];
-		return $backends;
-	}
+        $backends = [
+            $container->query(AmazonS3::class)
+        ];
+        return $backends;
+    }
 
-	/**
-	 * @{inheritdoc}
-	 */
-	public function getAuthMechanisms() {
-		$container = $this->getContainer();
-		return [
-			$container->query('\OC\Files\External\Auth\NullMechanism'),
-			$container->query(AccessKey::class)
-		];
-	}
+    /**
+     * @{inheritdoc}
+     */
+    public function getAuthMechanisms() {
+        $container = $this->getContainer();
+        return [
+            $container->query('\OC\Files\External\Auth\NullMechanism'),
+            $container->query(AccessKey::class)
+        ];
+    }
 }
